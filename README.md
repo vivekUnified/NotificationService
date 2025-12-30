@@ -106,3 +106,18 @@ To deploy this system to a production environment (e.g., AWS, GCP, DigitalOcean)
         ```bash
         python manage.py migrate
         ```
+
+5.  **Run Server:**
+    ```bash
+    python manage.py runserver
+    ```
+## Documentation
+
+The API documentation is available at `http://localhost:8000/swagger/`. 
+
+The admin dashboard is available at `http://localhost:8000/admin/`. 
+
+create superuser:
+```bash
+python manage.py createsuperuser
+```

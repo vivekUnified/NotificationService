@@ -6,3 +6,4 @@ psycopg2-binary
 gunicorn
 python-dotenv
 dj-database-url
+drf-yasg
