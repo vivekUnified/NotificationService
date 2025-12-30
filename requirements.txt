@@ -7,3 +7,4 @@ gunicorn
 python-dotenv
 dj-database-url
 drf-yasg
+django-filter
