@@ -16,7 +16,13 @@ class AdminDashboardStatsView(APIView):
         channel_data = NotificationLog.objects.values('channel').annotate(count=Count('channel'))
         channel_counts = {item['channel']: item['count'] for item in channel_data}
         
+        # 3. Recent Logs
+        recent_logs = NotificationLog.objects.order_by('-timestamp')[:10].values(
+            'user_id', 'channel', 'status', 'timestamp', 'destination'
+        )
+        
         return Response({
             "status_counts": status_counts,
-            "channel_counts": channel_counts
+            "channel_counts": channel_counts,
+            "recent_logs": list(recent_logs)
         })

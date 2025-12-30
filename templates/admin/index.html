@@ -73,18 +73,32 @@
 
     <!-- CENTER: Charts -->
     <div class="center-content">
-        <div class="chart-box">
-            <h3>Notification Status</h3>
-            <div style="height: 250px; width: 100%;">
-                <canvas id="statusChart"></canvas>
+        <div class="dashboard-container">
+            <div class="chart-box">
+                <h3>Notification Status</h3>
+                <div style="height: 250px; width: 100%;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-box">
+                <h3>Channel Usage</h3>
+                <div style="height: 250px; width: 100%;">
+                    <canvas id="channelChart"></canvas>
+                </div>
             </div>
         </div>
-        <div class="chart-box">
-            <h3>Channel Usage</h3>
-            <div style="height: 250px; width: 100%;">
-                <canvas id="channelChart"></canvas>
-            </div>
-        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User ID</th>
+                    <th>Channel</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="logs-table-body">
+            </tbody>
+        </table>
     </div>
     <!-- RIGHT: Recent Actions -->
     <div class="right-sidebar">
@@ -152,8 +166,6 @@
                         }
                     });
                 }
-
-                // Channel Chart
                 const channelCanvas = document.getElementById('channelChart');
                 if (channelCanvas) {
                     new Chart(channelCanvas.getContext('2d'), {
@@ -174,6 +186,26 @@
                             }
                         }
                     });
+                }
+
+                // Recent Logs Table
+                const logsBody = document.getElementById('logs-table-body');
+                if (data.recent_logs && data.recent_logs.length > 0) {
+                    logsBody.innerHTML = '';
+                    data.recent_logs.forEach(log => {
+                        const date = new Date(log.timestamp).toLocaleString();
+                        const row = `
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 8px;">${date}</td>
+                                <td style="padding: 8px;">${log.user_id}</td>
+                                <td style="padding: 8px;">${log.channel}</td>
+                                <td style="padding: 8px;">${log.status}</td>
+                            </tr>
+                        `;
+                        logsBody.innerHTML += row;
+                    });
+                } else {
+                    logsBody.innerHTML = '<tr><td colspan="4" style="padding: 10px;">No logs found.</td></tr>';
                 }
             })
             .catch(error => console.error('Error fetching stats:', error));
