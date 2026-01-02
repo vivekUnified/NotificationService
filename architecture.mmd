@@ -2,7 +2,7 @@ graph TD
     %% Nodes
     Client((External Client))
     API[Event Intake Service]
-    MQ[Message Queue (RabbitMQ)]
+    MQ[Message Queue - RabbitMQ]
     
     subgraph "Worker Cluster (Celery)"
         Processor[Notification Processor]
@@ -13,7 +13,7 @@ graph TD
     DB[(PostgreSQL)]
     Redis[(Redis - Cache/RateLimit)]
 
-    External[External Providers\n(Email, Slack, SMS)]
+    External[External Providers \n Email, Slack, SMS]
 
     %% Flow
     Client -->|1. POST /api/events/| API
