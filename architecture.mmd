@@ -1,0 +1,43 @@
+graph TD
+    %% Nodes
+    Client((External Client))
+    API[Event Intake Service]
+    MQ[Message Queue (RabbitMQ)]
+    
+    subgraph "Worker Cluster (Celery)"
+        Processor[Notification Processor]
+        Router[Traffic Control / Router]
+        Delivery[Delivery Gateway]
+    end
+
+    DB[(PostgreSQL)]
+    Redis[(Redis - Cache/RateLimit)]
+
+    External[External Providers\n(Email, Slack, SMS)]
+
+    %% Flow
+    Client -->|1. POST /api/events/| API
+    API -->|2. Validate & Enqueue 'process_event'| MQ
+
+    MQ -->|3. Consume 'process_event'| Processor
+    Processor -->|4. Format Notification| Router
+    
+    %% Note: The code calls route_notification.delay(), so it goes back to queue potentially, 
+    %% but logically it flows to Router. I will represent the async handoff.
+    Processor -.->|Async Task 'route_notification'| MQ
+    MQ -->|5. Consume 'route_notification'| Router
+
+    Router -->|6. Check User Prefs| DB
+    Router -->|7. Check Rate Limit| Redis
+    
+    Router -.->|Async Task 'send_message'| MQ
+    MQ -->|8. Consume 'send_message'| Delivery
+
+    Delivery -->|9. Select Channel Adapter| External
+    Delivery -->|10. Log Result| DB
+
+    %% Styling
+    classDef service fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef storage fill:#ff9,stroke:#333,stroke-width:2px;
+    class API,Processor,Router,Delivery service;
+    class DB,Redis,MQ storage;
